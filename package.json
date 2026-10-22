@@ -1,0 +1,15 @@
+{
+  "name": "buffett-substanz-scanner",
+  "version": "1.0.0",
+  "description": "Täglicher Warren-Buffett Substanz- & Insolvenzmasse-Aktienscanner für DAX 40 (DE), BIST 30 (Türkei) und S&P 500 (USA)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "scan": "node -e \"require('./src/scanner').runDailyScan({ force: true }).then(r => console.log('Scan abgeschlossen:', r.summary))\""
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "node-cron": "^4.2.1",
+    "yahoo-finance2": "^3.13.0"
+  }
+}

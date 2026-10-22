@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buffett Substanz- & Insolvenzmasse-Scanner | DAX 40 · BIST 30 · S&P 500</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="top-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <div class="brand-badge">VALUE SCANNER</div>
+        <h1>Warren Buffett Substanz- &amp; Insolvenzmasse-Scanner</h1>
+        <p class="subtitle">
+          Tägliche Ermittlung unterbewerteter Aktien in <strong>🇩🇪 Deutschland (DAX 40)</strong>,
+          <strong>🇹🇷 Türkei (BIST 30)</strong> und <strong>🇺🇸 USA (S&amp;P 500)</strong>, deren Börsenwert
+          höchstens ihrem Substanz-/Liquidationswert aus Anlagevermögen &amp; liquiden Mitteln entspricht.
+        </p>
+      </div>
+      <div class="header-actions">
+        <div class="scan-meta" id="scanMetaBox">
+          <div class="meta-row">
+            <span class="meta-label">Tages-Stand:</span>
+            <strong id="lastScanText">Wird geladen…</strong>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Automatik:</span>
+            <span>Täglich 08:00 Uhr &amp; beim Start</span>
+          </div>
+          <div class="meta-row" id="fxRow">
+            <span class="meta-label">Wechselkurse:</span>
+            <span id="fxText">–</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Realtime-Feed:</span>
+            <span id="wsStatusText" class="ws-status connecting">Verbinde Browser-WebSocket…</span>
+          </div>
+        </div>
+        <div class="action-buttons">
+          <select id="historySelect" class="select-input" title="Gespeicherte Tages-Scans">
+            <option value="latest">Aktuellster Tages-Scan</option>
+          </select>
+          <button id="refreshBtn" class="btn-primary">
+            <span class="btn-icon">↻</span> Jetzt neu ermitteln
+          </button>
+          <button id="exportCsvBtn" class="btn-secondary" title="Gefilterte Liste als CSV exportieren">
+            CSV Export
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Scan Progress Banner -->
+  <div id="progressBanner" class="progress-banner hidden">
+    <div class="container">
+      <div class="progress-info">
+        <span class="spinner"></span>
+        <strong id="progressPhase">Tages-Scan läuft…</strong>
+        <span id="progressDetail">0 / 0 Aktien geprüft</span>
+      </div>
+      <div class="progress-bar-outer">
+        <div id="progressBarInner" class="progress-bar-inner" style="width: 0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <main class="container main-content">
+    <!-- Bewertungs-Modus Auswahl -->
+    <section class="mode-section">
+      <div class="section-header">
+        <h2>1. Bewertungs-Prinzip für „Insolvenzmasse / Substanzwert“ wählen</h2>
+        <span class="formula-pill" id="activeFormulaText">
+          Formel: (Materielles Anlagevermögen + Umlaufvermögen inkl. Cash − Alle Verbindlichkeiten) ≥ Marktkapitalisierung
+        </span>
+      </div>
+      <div class="mode-cards" id="modeCards">
+        <button class="mode-card active" data-mode="net">
+          <div class="mode-card-top">
+            <span class="mode-tag recommended">Standard · Empfohlen</span>
+            <span class="mode-count" id="countModeNet">– Treffer</span>
+          </div>
+          <h3>Netto-Substanzwert (nach Abzug aller Schulden)</h3>
+          <p>
+            Materielles Anlagevermögen + Liquide Mittel &amp; Umlaufvermögen <strong>abzüglich sämtlicher Verbindlichkeiten</strong>
+            (ohne wertlosen Goodwill) ≥ Börsenwert.
+          </p>
+        </button>
+
+        <button class="mode-card" data-mode="strictNet">
+          <div class="mode-card-top">
+            <span class="mode-tag">Ultra-Streng</span>
+            <span class="mode-count" id="countModeStrict">– Treffer</span>
+          </div>
+          <h3>Strenger Netto-Wert (nur Anlagevermögen + Cash − Schulden)</h3>
+          <p>
+            Nur materielles Anlagevermögen + liquide Mittel <strong>abzüglich aller Schulden</strong> ≥ Börsenwert
+            (Vorräte &amp; Forderungen werden mit 0 € angesetzt).
+          </p>
+        </button>
+
+        <button class="mode-card" data-mode="gross">
+          <div class="mode-card-top">
+            <span class="mode-tag">Brutto-Betrachtung</span>
+            <span class="mode-count" id="countModeGross">– Treffer</span>
+          </div>
+          <h3>Brutto-Substanz (Anlagevermögen + Liquide Mittel)</h3>
+          <p>
+            Materielles Anlagevermögen (Sach- &amp; Finanzanlagen) + liquide Mittel <strong>ohne Schuldenabzug</strong>
+            ≥ Marktkapitalisierung.
+          </p>
+        </button>
+
+        <button class="mode-card" data-mode="book">
+          <div class="mode-card-top">
+            <span class="mode-tag">Klassisch (KBV ≤ 1,0)</span>
+            <span class="mode-count" id="countModeBook">– Treffer</span>
+          </div>
+          <h3>Bilanzielles Eigenkapital (Buchwert ≥ Börsenwert)</h3>
+          <p>
+            Gesamtes ausgewiesenes Eigenkapital (Aktiva minus Verbindlichkeiten inkl. immaterieller Werte) ≥ Marktkapitalisierung.
+          </p>
+        </button>
+      </div>
+    </section>
+
+    <!-- KPI & Index-Auswahl -->
+    <section class="index-tabs-section">
+      <div class="index-tabs" id="indexTabs">
+        <button class="index-tab active" data-index="ALL">
+          <span class="flag">🌍</span>
+          <div class="tab-text">
+            <strong>Alle 3 Märkte (DE / TR / USA)</strong>
+            <span id="tabSubAll">– Treffer von – Aktien</span>
+          </div>
+        </button>
+        <button class="index-tab" data-index="DAX 40">
+          <span class="flag">🇩🇪</span>
+          <div class="tab-text">
+            <strong>DAX 40 (Deutschland)</strong>
+            <span id="tabSubDax">– Treffer von – Aktien</span>
+          </div>
+        </button>
+        <button class="index-tab" data-index="BIST 30">
+          <span class="flag">🇹🇷</span>
+          <div class="tab-text">
+            <strong>BIST 30 (Türkei)</strong>
+            <span id="tabSubBist">– Treffer von – Aktien</span>
+          </div>
+        </button>
+        <button class="index-tab" data-index="S&P 500">
+          <span class="flag">🇺🇸</span>
+          <div class="tab-text">
+            <strong>S&amp;P 500 (USA)</strong>
+            <span id="tabSubSp500">– Treffer von – Aktien</span>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- Filter & Steuerung -->
+    <section class="controls-bar">
+      <div class="control-group threshold-group">
+        <div class="threshold-header">
+          <label for="thresholdSlider">
+            Mindest-Deckungsgrad (Substanz im Verhältnis zum Börsenwert):
+            <strong id="thresholdValueLabel">≥ 100 % (Substanz ≥ Börsenwert)</strong>
+          </label>
+          <div class="preset-pills">
+            <button class="preset-pill active" data-threshold="100">≥ 100% (Buffett-Kriterium)</button>
+            <button class="preset-pill" data-threshold="80">≥ 80% (Nahe dran)</button>
+            <button class="preset-pill" data-threshold="50">≥ 50%</button>
+            <button class="preset-pill" data-threshold="0">Alle zeigen (Ranking)</button>
+          </div>
+        </div>
+        <input type="range" id="thresholdSlider" min="0" max="150" step="5" value="100" />
+      </div>
+
+      <div class="control-group search-sort-group">
+        <div class="input-wrap">
+          <label for="searchInput">Aktie suchen (Name / Ticker)</label>
+          <input type="text" id="searchInput" class="text-input" placeholder="z. B. Volkswagen, Koç, Citigroup, BMW…" />
+        </div>
+        <div class="input-wrap">
+          <label for="futureFilterSelect">Zukunfts-Filter (Value-Trap-Schutz)</label>
+          <select id="futureFilterSelect" class="select-input">
+            <option value="all">Alle anzeigen (mit Warnhinweisen)</option>
+            <option value="no_critical">🟢+🟡 Kritische Value-Traps ausblenden (Score &gt; 42)</option>
+            <option value="strong_only">🟢 Nur Zukunft Solide / Stark (Score ≥ 65)</option>
+          </select>
+        </div>
+        <div class="input-wrap">
+          <label for="sortSelect">Sortierung</label>
+          <select id="sortSelect" class="select-input">
+            <option value="future_desc" selected>Bester Zukunfts- &amp; Qualitäts-Score (Standard)</option>
+            <option value="combined_desc">Kombi: Hohe Substanz + Gute Zukunft</option>
+            <option value="coverage_desc">Höchster Substanz-Deckungsgrad (%)</option>
+            <option value="future_asc">Schlechtester Zukunfts-Score (Risiken zuerst)</option>
+            <option value="coverage_asc">Niedrigster Substanz-Deckungsgrad (%)</option>
+            <option value="mcap_desc">Marktkapitalisierung (absteigend)</option>
+            <option value="mcap_asc">Marktkapitalisierung (aufsteigend)</option>
+            <option value="pe_asc">Niedrigstes KGV (P/E)</option>
+            <option value="div_desc">Höchste Dividendenrendite</option>
+            <option value="name_asc">Name (A–Z)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ergebnis-Kopfzeile -->
+    <section class="results-header">
+      <div>
+        <h2 id="resultsTitle">Ermittelte Aktien</h2>
+        <p id="resultsSubtitle" class="results-subtitle">Lade Bilanzdaten…</p>
+      </div>
+    </section>
+
+    <!-- Tabelle der ermittelten Aktien -->
+    <section class="table-container">
+      <table class="stocks-table">
+        <thead>
+          <tr>
+            <th>Aktie / Index</th>
+            <th class="num">Aktueller Kurs</th>
+            <th class="chart-col">Realtime-Kursverlauf<br /><small>(Live-Stream &amp; Intraday)</small></th>
+            <th class="num">Substanzwert je Aktie</th>
+            <th class="num">Deckungsgrad<br /><small>(Substanz / Börsenwert)</small></th>
+            <th class="num">Kurs / Substanz<br /><small>(Ziel ≤ 1,00x)</small></th>
+            <th class="future-col">Zukunfts- &amp; Qualitäts-Check<br /><small>(Gewinn, FCF, ROE &amp; Value-Trap-Warnsystem)</small></th>
+            <th class="num">Börsenwert<br /><small>(Marktkapitalisierung)</small></th>
+            <th class="num">Berechnete Substanz<br /><small>(Insolvenzmasse)</small></th>
+            <th class="num">Anlagevermögen<br /><small>(materiell, inkl. PPE)</small></th>
+            <th class="num">Liquide Mittel<br /><small>(Cash &amp; Wertpapiere)</small></th>
+            <th class="num">Verbindlichkeiten<br /><small>(Gesamtschulden)</small></th>
+            <th>Bilanz-Details</th>
+          </tr>
+        </thead>
+        <tbody id="stocksTableBody">
+          <tr>
+            <td colspan="13" class="empty-cell">Daten werden geladen…</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- Detail-Modal für vollständige Bilanz-Aufschlüsselung -->
+  <div id="detailModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="modal-badge" id="modalIndexBadge">DAX 40</span>
+          <h2 id="modalTitle">Unternehmensname (SYMBOL)</h2>
+          <p id="modalSubtitle" class="modal-subtitle">Bilanzstichtag: –</p>
+        </div>
+        <button id="closeModalBtn" class="modal-close" title="Schließen">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Google-Finance-Style Interaktives Chart-Analyse-Modal (100% Client-Side Canvas) -->
+  <div id="chartModal" class="modal-backdrop hidden">
+    <div class="modal-card gf-modal-card">
+      <div class="gf-top-bar">
+        <div class="gf-breadcrumb" id="gfBreadcrumb">DAX 40 · VOW3.DE</div>
+        <button id="closeChartModalBtn" class="modal-close" title="Schließen">&times;</button>
+      </div>
+
+      <div class="gf-header">
+        <h2 id="gfCompanyName">Volkswagen AG</h2>
+        <div class="gf-price-row">
+          <span class="gf-main-price" id="gfMainPrice">68,66 €</span>
+          <span class="gf-price-change neg" id="gfPriceChange">↓ -0,64% (-0,44) Heute</span>
+        </div>
+        <div class="gf-submeta" id="gfSubMeta">22. Okt., 13:30 UTC+2 · EUR · Realtime Client-Stream</div>
+      </div>
+
+      <!-- Toolbar wie bei Google Finance: Bereichsdiagramm / Kerzen + Indikatoren -->
+      <div class="gf-toolbar">
+        <div class="gf-tool-group">
+          <label class="gf-tool-pill">
+            <span>📈 Diagrammtyp:</span>
+            <select id="gfChartTypeSelect" class="gf-inline-select">
+              <option value="area">Bereichsdiagramm</option>
+              <option value="candles">Kerzendiagramm (OHLC)</option>
+            </select>
+          </label>
+          <label class="gf-tool-check">
+            <input type="checkbox" id="gfShowVolume" checked />
+            <span>Volumen-Balken</span>
+          </label>
+          <label class="gf-tool-check">
+            <input type="checkbox" id="gfShowPrevClose" checked />
+            <span>Vortagesschluss</span>
+          </label>
+          <label class="gf-tool-check">
+            <input type="checkbox" id="gfShowSMA" />
+            <span>GD 20 (SMA)</span>
+          </label>
+          <label class="gf-tool-check">
+            <input type="checkbox" id="gfShowSubstance" />
+            <span>Substanzwert-Linie</span>
+          </label>
+        </div>
+        <div class="gf-hover-readout" id="gfHoverReadout">
+          Maus / Finger über den Chart bewegen für exakte Kerzen- &amp; Volumendaten
+        </div>
+      </div>
+
+      <!-- Großer High-DPI Chart-Bereich -->
+      <div class="gf-canvas-container">
+        <canvas id="gfAnalyzerCanvas" width="880" height="360"></canvas>
+      </div>
+
+      <!-- Zeitraum-Auswahl exakt wie im Google-Finance-Screenshot -->
+      <div class="gf-range-bar" id="gfRangeBar">
+        <button class="gf-range-btn active" data-range="1d" data-interval="5m" data-label="Heute">1 T</button>
+        <button class="gf-range-btn" data-range="5d" data-interval="15m" data-label="5 Tage">5 T</button>
+        <button class="gf-range-btn" data-range="1mo" data-interval="60m" data-label="1 Monat">1 M</button>
+        <button class="gf-range-btn" data-range="6mo" data-interval="1d" data-label="6 Monate">6 M</button>
+        <button class="gf-range-btn" data-range="ytd" data-interval="1d" data-label="seit Jahresbeginn">seit Jahresbeginn</button>
+        <button class="gf-range-btn" data-range="1y" data-interval="1d" data-label="1 Jahr">1 J</button>
+        <button class="gf-range-btn" data-range="5y" data-interval="1wk" data-label="5 Jahre">5 J</button>
+        <button class="gf-range-btn" data-range="max" data-interval="1mo" data-label="Gesamtzeitraum">MAX</button>
+      </div>
+
+      <!-- Kompakte Statistik-Leiste unter dem Chart -->
+      <div class="gf-stats-grid" id="gfStatsGrid"></div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
