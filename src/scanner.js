@@ -649,6 +649,12 @@ async function runDailyScan({ force = false } = {}) {
     const historyFile = path.join(HISTORY_DIR, `${todayStr}.json`);
     fs.writeFileSync(historyFile, JSON.stringify(resultPayload, null, 2), 'utf8');
 
+    try {
+      scanStatus.phase = 'Speichere echte 5-Jahres- & Intraday-Charts für alle Aktien...';
+      const { buildAllChartsCache } = require('./build-charts-cache');
+      await buildAllChartsCache();
+    } catch (_) {}
+
     scanStatus.isScanning = false;
     scanStatus.completedAt = new Date().toISOString();
     scanStatus.phase = 'Abgeschlossen';

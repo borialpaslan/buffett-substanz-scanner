@@ -59,6 +59,18 @@ async function deployToFirebaseHosting() {
     { webPath: '/data/latest-scan.json', diskPath: path.join(rootDir, 'data', 'latest-scan.json') }
   ];
 
+  const chartsDir = path.join(rootDir, 'data', 'charts');
+  if (fs.existsSync(chartsDir)) {
+    for (const fn of fs.readdirSync(chartsDir)) {
+      if (fn.endsWith('.json')) {
+        fileEntries.push({
+          webPath: `/data/charts/${fn}`,
+          diskPath: path.join(chartsDir, fn)
+        });
+      }
+    }
+  }
+
   const filesMap = {};
   const gzByHash = new Map();
 
@@ -84,24 +96,32 @@ async function deployToFirebaseHosting() {
 
   const requiredHashes = popJson.uploadRequiredHashes || [];
   const uploadUrl = popJson.uploadUrl;
+  console.log(`Lade ${requiredHashes.length} geänderte Dateien zu Google Firebase Hosting hoch...`);
 
-  // 5. Fehlende Dateien hochladen
-  for (const hash of requiredHashes) {
-    const gzBuf = gzByHash.get(hash);
-    if (!gzBuf) continue;
-    const upRes = await fetch(`${uploadUrl}/${hash}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'x-goog-user-project': PROJECT_ID,
-        'Content-Type': 'application/octet-stream'
-      },
-      body: gzBuf
-    });
-    if (!upRes.ok) {
-      throw new Error(`Upload für ${hash} fehlgeschlagen: ${upRes.status}`);
-    }
-  }
+  // 5. Fehlende Dateien parallel hochladen
+  let upCursor = 0;
+  const upConcurrency = 25;
+  await Promise.all(
+    Array.from({ length: upConcurrency }, async () => {
+      while (upCursor < requiredHashes.length) {
+        const hash = requiredHashes[upCursor++];
+        const gzBuf = gzByHash.get(hash);
+        if (!gzBuf) continue;
+        const upRes = await fetch(`${uploadUrl}/${hash}`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'x-goog-user-project': PROJECT_ID,
+            'Content-Type': 'application/octet-stream'
+          },
+          body: gzBuf
+        });
+        if (!upRes.ok) {
+          throw new Error(`Upload für ${hash} fehlgeschlagen: ${upRes.status}`);
+        }
+      }
+    })
+  );
 
   // 6. Version finalisieren
   const finRes = await fetch(`https://firebasehosting.googleapis.com/v1beta1/${versionName}?update_mask=status`, {

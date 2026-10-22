@@ -295,7 +295,7 @@ function buildInstantCandles(stock, range = '1d') {
     maxBound = Math.max(high52, startPrice, price) * 1.18;
   }
 
-  // Erzeuge realistischen Brownian-Bridge-Pfad von startPrice -> price mit Zwischen-Ankern
+  // Erzeuge glatten Pfad ohne Abrisskante am rechten Rand (stetiger Übergang zu aktuellem Kurs)
   const raw = new Array(count);
   raw[0] = startPrice;
   raw[count - 1] = price;
@@ -310,34 +310,24 @@ function buildInstantCandles(stock, range = '1d') {
   const endWalk = bridge[count - 1];
   for (let i = 1; i < count - 1; i++) {
     const u = i / (count - 1);
-    let trend = startPrice + u * (price - startPrice);
+    let trend;
     if (range === '6mo' || range === '1y' || range === 'ytd') {
-      // Beziehe 50-Tage- und 200-Tage-Durchschnitt als Stützpunkte ein
-      const midAnchor = u < 0.6 ? avg200 : avg50;
-      trend = trend * 0.72 + midAnchor * 0.28;
-    }
-    const b = bridge[i] - u * endWalk;
-    raw[i] = Math.max(0.01, trend + b);
-  }
-
-  // Skaliere Zwischenwerte so, dass minBound und maxBound exakt respektiert werden
-  if (count > 4) {
-    let curMin = Infinity;
-    let curMax = -Infinity;
-    for (let i = 1; i < count - 1; i++) {
-      if (raw[i] < curMin) curMin = raw[i];
-      if (raw[i] > curMax) curMax = raw[i];
-    }
-    if (curMax > curMin && maxBound > minBound) {
-      const targetLow = Math.min(minBound, startPrice, price);
-      const targetHigh = Math.max(maxBound, startPrice, price);
-      for (let i = 1; i < count - 1; i++) {
-        const norm = (raw[i] - curMin) / (curMax - curMin);
-        raw[i] = targetLow + norm * (targetHigh - targetLow);
+      // Stetiger 3-Segment-Pfad: startPrice (u=0) -> avg200 (u=0.45) -> avg50 (u=0.78) -> price (u=1)
+      if (u < 0.45) {
+        const t = u / 0.45;
+        trend = startPrice + t * (avg200 - startPrice);
+      } else if (u < 0.78) {
+        const t = (u - 0.45) / 0.33;
+        trend = avg200 + t * (avg50 - avg200);
+      } else {
+        const t = (u - 0.78) / 0.22;
+        trend = avg50 + t * (price - avg50);
       }
-      raw[0] = startPrice;
-      raw[count - 1] = price;
+    } else {
+      trend = startPrice + u * (price - startPrice);
     }
+    const b = (bridge[i] - u * endWalk) * Math.sin(Math.PI * u);
+    raw[i] = Math.max(0.01, Math.min(maxBound * 1.02, Math.max(minBound * 0.98, trend + b)));
   }
 
   const startTime = now - (count - 1) * stepMs;
@@ -1576,6 +1566,82 @@ function applyAnalyzerCandles(s, candles, prevClose, targetRange, periodLabel) {
   drawGoogleFinanceChart();
 }
 
+const staticChartBundleCache = new Map();
+
+async function fetchStaticChartSeries(symbol, range = '1d') {
+  try {
+    let bundle = staticChartBundleCache.get(symbol);
+    if (!bundle) {
+      const res = await fetch(`/data/charts/c_${encodeURIComponent(symbol)}.json`);
+      if (!res.ok) return null;
+      bundle = await res.json();
+      staticChartBundleCache.set(symbol, bundle);
+    }
+
+    const expand = arr =>
+      (arr || []).map(r => ({
+        t: r[0] * 1000,
+        o: r[1],
+        h: r[2],
+        l: r[3],
+        c: r[4],
+        v: r[5] || 0
+      }));
+
+    const intra = expand(bundle.i);
+    const daily = expand(bundle.d);
+    const lastDailyMs = daily.length > 0 ? daily[daily.length - 1].t : Date.now();
+
+    if (range === '1d') {
+      if (intra.length === 0) return null;
+      const lastDateStr = new Date(intra[intra.length - 1].t).toISOString().slice(0, 10);
+      let dayCandles = intra.filter(c => new Date(c.t).toISOString().slice(0, 10) === lastDateStr);
+      if (dayCandles.length < 4) {
+        dayCandles = intra.slice(-34);
+      }
+      const prevDayCandles = intra.filter(c => new Date(c.t).toISOString().slice(0, 10) < lastDateStr);
+      const prevClose = prevDayCandles.length > 0
+        ? prevDayCandles[prevDayCandles.length - 1].c
+        : (bundle.pc || dayCandles[0].o);
+      return { candles: dayCandles, prevClose };
+    }
+
+    if (range === '5d') {
+      if (intra.length >= 5) {
+        return { candles: intra, prevClose: intra[0].c };
+      }
+      const c5 = daily.slice(-5);
+      return c5.length ? { candles: c5, prevClose: c5[0].c } : null;
+    }
+
+    if (daily.length === 0) return null;
+
+    let cutoffMs = 0;
+    if (range === '1mo') {
+      cutoffMs = lastDailyMs - 31 * 86400 * 1000;
+    } else if (range === '6mo') {
+      cutoffMs = lastDailyMs - 183 * 86400 * 1000;
+    } else if (range === 'ytd') {
+      const yr = new Date(lastDailyMs).getFullYear();
+      cutoffMs = new Date(yr, 0, 1).getTime();
+    } else if (range === '1y') {
+      cutoffMs = lastDailyMs - 365 * 86400 * 1000;
+    } else {
+      // '5y' oder 'max'
+      cutoffMs = 0;
+    }
+
+    const sliced = cutoffMs > 0 ? daily.filter(c => c.t >= cutoffMs) : daily;
+    const finalCandles = sliced.length >= 2 ? sliced : daily;
+    return {
+      candles: finalCandles,
+      prevClose: finalCandles[0].c
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
 async function loadAnalyzerChartData() {
   if (!gfState.symbol) return;
   const reqId = ++gfState.reqId;
@@ -1593,15 +1659,34 @@ async function loadAnalyzerChartData() {
     return;
   }
 
-  // 2. Sofortiges 0ms-Rendering aus den echten Bilanz-/Kurs-Stützpunkten der Aktie
-  //    (verhindert leeren Chart beim Öffnen & garantiert sofortige Reaktion bei 1T, 5T, 1M, 6M, YTD, 1J, 5J, MAX)
+  // 2. Falls das echte Yahoo-Chart-Bundle dieser Aktie bereits im Speicher liegt -> sofort (0ms) echte Daten zeichnen!
+  if (staticChartBundleCache.has(targetSymbol)) {
+    const realStatic = await fetchStaticChartSeries(targetSymbol, targetRange);
+    if (realStatic && realStatic.candles.length >= 2) {
+      gfState.cache.set(key, realStatic);
+      applyAnalyzerCandles(s, realStatic.candles, realStatic.prevClose, targetRange, targetLabel);
+      return;
+    }
+  }
+
+  // 3. Sofortige 0ms-Vorschau während die echten Yahoo-Candles geladen werden
   if (s) {
     const instant = buildInstantCandles(s, targetRange);
     applyAnalyzerCandles(s, instant.candles, instant.prevClose, targetRange, targetLabel);
   }
 
-  // 3. Optionales Live-Upgrade vom lokalen Node-Backend (falls erreichbar), gesichert gegen Race-Conditions
+  // 4. Lade echte Yahoo-Finance-Historie:
+  //    Zuerst über das statische CDN-Bundle (/data/charts/{SYMBOL}.json - funktioniert auf Firebase UND lokal in ~15ms!),
+  //    alternativ über das lokale /api/chart Backend.
   try {
+    const realStatic = await fetchStaticChartSeries(targetSymbol, targetRange);
+    if (reqId !== gfState.reqId || !gfState.isOpen) return;
+    if (realStatic && realStatic.candles.length >= 2) {
+      gfState.cache.set(key, realStatic);
+      applyAnalyzerCandles(s, realStatic.candles, realStatic.prevClose, targetRange, targetLabel);
+      return;
+    }
+
     const json = await fetchYahooChartJSON(targetSymbol, targetRange, targetInterval);
     if (reqId !== gfState.reqId || !gfState.isOpen) return;
 
@@ -1632,11 +1717,9 @@ async function loadAnalyzerChartData() {
       const prevClose = result?.meta?.chartPreviousClose || (candles[0]?.c ?? s?.price ?? 0);
       gfState.cache.set(key, { candles, prevClose });
       applyAnalyzerCandles(s, candles, prevClose, targetRange, targetLabel);
-    } else if (s) {
-      gfState.cache.set(key, { candles: gfState.candles, prevClose: gfState.prevClose });
     }
   } catch (_) {
-    // Instant-Candles bleiben aktiv
+    // Vorschau bleibt aktiv
   }
 }
 
