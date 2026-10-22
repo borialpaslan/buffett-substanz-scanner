@@ -344,8 +344,8 @@ body {
 /* Index Tabs */
 .index-tabs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
 @media (max-width: 900px) {
@@ -632,10 +632,40 @@ input[type='range'] {
   background: rgba(252, 211, 77, 0.08);
 }
 
+.index-pill.mdax {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.35);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.index-pill.tecdax {
+  color: #a78bfa;
+  border-color: rgba(167, 139, 250, 0.35);
+  background: rgba(167, 139, 250, 0.08);
+}
+
+.index-pill.eurostoxx {
+  color: #60a5fa;
+  border-color: rgba(96, 165, 250, 0.35);
+  background: rgba(96, 165, 250, 0.08);
+}
+
 .index-pill.bist {
   color: #f87171;
   border-color: rgba(248, 113, 113, 0.35);
   background: rgba(248, 113, 113, 0.08);
+}
+
+.index-pill.dow {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(52, 211, 153, 0.08);
+}
+
+.index-pill.tech100 {
+  color: #22d3ee;
+  border-color: rgba(34, 211, 238, 0.35);
+  background: rgba(34, 211, 238, 0.08);
 }
 
 .index-pill.sp500 {

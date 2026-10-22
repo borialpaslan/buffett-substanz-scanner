@@ -429,10 +429,18 @@ function computeBuffettMetrics(item, quote, finData, fxRates) {
     name: quote.longName || quote.shortName || item.name || item.symbol,
     country: item.country,
     index: item.index,
+    indices: Array.isArray(item.indices) && item.indices.length > 0 ? item.indices : [item.index],
     currency: priceCurrency,
     financialCurrency: finCurrency,
     currencyConverted: priceCurrency !== finCurrency,
     price,
+    openPrice: quote.regularMarketOpen ?? price,
+    prevClose: quote.regularMarketPreviousClose ?? price,
+    dayLow: quote.regularMarketDayLow ?? price,
+    dayHigh: quote.regularMarketDayHigh ?? price,
+    fiftyDayAvg: quote.fiftyDayAverage ?? price,
+    twoHundredDayAvg: quote.twoHundredDayAverage ?? price,
+    dayVolume: quote.regularMarketVolume ?? 0,
     changePercent: quote.regularMarketChangePercent ?? 0,
     marketCap,
     marketCapEUR,
@@ -524,8 +532,9 @@ async function runDailyScan({ force = false } = {}) {
         existing &&
         existing.scanDate === todayStr &&
         Array.isArray(existing.stocks) &&
-        existing.stocks.length > 100 &&
-        existing.stocks[0].futureScore !== undefined
+        existing.stocks.length > 580 &&
+        existing.stocks[0].futureScore !== undefined &&
+        Array.isArray(existing.stocks[0].indices)
       ) {
         return existing;
       }
@@ -606,12 +615,20 @@ async function runDailyScan({ force = false } = {}) {
 
     stocks.sort((a, b) => (b.netCoveragePct || 0) - (a.netCoveragePct || 0));
 
+    const hasIdx = (s, idxName) =>
+      Array.isArray(s.indices) ? s.indices.includes(idxName) : s.index === idxName;
+
     const summary = {
       totalScanned: stocks.length,
       byIndex: {
-        'DAX 40': stocks.filter(s => s.index === 'DAX 40').length,
-        'BIST 30': stocks.filter(s => s.index === 'BIST 30').length,
-        'S&P 500': stocks.filter(s => s.index === 'S&P 500').length
+        'DAX 40': stocks.filter(s => hasIdx(s, 'DAX 40')).length,
+        'MDAX': stocks.filter(s => hasIdx(s, 'MDAX')).length,
+        'TecDAX': stocks.filter(s => hasIdx(s, 'TecDAX')).length,
+        'Euro Stoxx 50': stocks.filter(s => hasIdx(s, 'Euro Stoxx 50')).length,
+        'BIST 30': stocks.filter(s => hasIdx(s, 'BIST 30')).length,
+        'Dow Jones': stocks.filter(s => hasIdx(s, 'Dow Jones')).length,
+        'US Tech 100': stocks.filter(s => hasIdx(s, 'US Tech 100')).length,
+        'S&P 500': stocks.filter(s => hasIdx(s, 'S&P 500')).length
       },
       matchesNetLiquidation: stocks.filter(s => s.isNetLiquidationMatch).length,
       matchesStrictNet: stocks.filter(s => s.isStrictNetMatch).length,

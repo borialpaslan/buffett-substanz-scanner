@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Buffett Substanz- & Insolvenzmasse-Scanner | DAX 40 · BIST 30 · S&P 500</title>
+  <title>Buffett Substanz- & Insolvenzmasse-Scanner | DAX · MDAX · TecDAX · EuroStoxx · BIST · Dow · Tech 100 · S&P 500</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -13,9 +13,9 @@
         <div class="brand-badge">VALUE SCANNER</div>
         <h1>Warren Buffett Substanz- &amp; Insolvenzmasse-Scanner</h1>
         <p class="subtitle">
-          Tägliche Ermittlung unterbewerteter Aktien in <strong>🇩🇪 Deutschland (DAX 40)</strong>,
-          <strong>🇹🇷 Türkei (BIST 30)</strong> und <strong>🇺🇸 USA (S&amp;P 500)</strong>, deren Börsenwert
-          höchstens ihrem Substanz-/Liquidationswert aus Anlagevermögen &amp; liquiden Mitteln entspricht.
+          Tägliche Ermittlung unterbewerteter Aktien in <strong>🇩🇪 DAX 40, MDAX &amp; TecDAX</strong>,
+          <strong>🇪🇺 Euro Stoxx 50</strong>, <strong>🇹🇷 BIST 30</strong> sowie <strong>🇺🇸 Dow Jones, US Tech 100 &amp; S&amp;P 500</strong>,
+          deren Börsenwert höchstens ihrem Substanz-/Liquidationswert aus Anlagevermögen &amp; liquiden Mitteln entspricht.
         </p>
       </div>
       <div class="header-actions">
@@ -131,15 +131,36 @@
         <button class="index-tab active" data-index="ALL">
           <span class="flag">🌍</span>
           <div class="tab-text">
-            <strong>Alle 3 Märkte (DE / TR / USA)</strong>
+            <strong>Alle 8 Indizes (Gesamt)</strong>
             <span id="tabSubAll">– Treffer von – Aktien</span>
           </div>
         </button>
         <button class="index-tab" data-index="DAX 40">
           <span class="flag">🇩🇪</span>
           <div class="tab-text">
-            <strong>DAX 40 (Deutschland)</strong>
+            <strong>DAX 40</strong>
             <span id="tabSubDax">– Treffer von – Aktien</span>
+          </div>
+        </button>
+        <button class="index-tab" data-index="MDAX">
+          <span class="flag">🇩🇪</span>
+          <div class="tab-text">
+            <strong>MDAX</strong>
+            <span id="tabSubMdax">– Treffer von – Aktien</span>
+          </div>
+        </button>
+        <button class="index-tab" data-index="TecDAX">
+          <span class="flag">🇩🇪</span>
+          <div class="tab-text">
+            <strong>TecDAX</strong>
+            <span id="tabSubTecdax">– Treffer von – Aktien</span>
+          </div>
+        </button>
+        <button class="index-tab" data-index="Euro Stoxx 50">
+          <span class="flag">🇪🇺</span>
+          <div class="tab-text">
+            <strong>Euro Stoxx 50</strong>
+            <span id="tabSubEurostoxx">– Treffer von – Aktien</span>
           </div>
         </button>
         <button class="index-tab" data-index="BIST 30">
@@ -147,6 +168,20 @@
           <div class="tab-text">
             <strong>BIST 30 (Türkei)</strong>
             <span id="tabSubBist">– Treffer von – Aktien</span>
+          </div>
+        </button>
+        <button class="index-tab" data-index="Dow Jones">
+          <span class="flag">🇺🇸</span>
+          <div class="tab-text">
+            <strong>Dow Jones (US 30)</strong>
+            <span id="tabSubDow">– Treffer von – Aktien</span>
+          </div>
+        </button>
+        <button class="index-tab" data-index="US Tech 100">
+          <span class="flag">🇺🇸</span>
+          <div class="tab-text">
+            <strong>US Tech 100 (Nasdaq)</strong>
+            <span id="tabSubTech100">– Treffer von – Aktien</span>
           </div>
         </button>
         <button class="index-tab" data-index="S&P 500">

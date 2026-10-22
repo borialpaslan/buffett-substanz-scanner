@@ -1,4 +1,12 @@
-// Vollständige Index-Listen für DAX 40 (DE), BIST 30 (Türkei) und S&P 500 (USA)
+// Vollständige Index-Listen für:
+// - DAX 40 (DE)
+// - MDAX (DE)
+// - TecDAX (DE)
+// - Euro Stoxx 50 (EU)
+// - BIST 30 (Türkei)
+// - Dow Jones 30 (USA)
+// - US Tech 100 / Nasdaq-100 (USA)
+// - S&P 500 (USA)
 
 const DAX_40 = [
   { symbol: 'ADS.DE', name: 'adidas AG', country: 'DE', index: 'DAX 40' },
@@ -43,6 +51,137 @@ const DAX_40 = [
   { symbol: 'ZAL.DE', name: 'Zalando SE', country: 'DE', index: 'DAX 40' }
 ];
 
+const MDAX_50 = [
+  { symbol: 'AFX.DE', name: 'Carl Zeiss Meditec AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'AIXA.DE', name: 'AIXTRON SE', country: 'DE', index: 'MDAX' },
+  { symbol: 'AT1.DE', name: 'Aroundtown SA', country: 'DE', index: 'MDAX' },
+  { symbol: 'BC8.DE', name: 'Bechtle AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'BFSA.DE', name: 'Befesa S.A.', country: 'DE', index: 'MDAX' },
+  { symbol: 'BOSS.DE', name: 'HUGO BOSS AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'CTS.DE', name: 'CTS Eventim AG & Co. KGaA', country: 'DE', index: 'MDAX' },
+  { symbol: 'DEL.DE', name: 'Delivery Hero SE', country: 'DE', index: 'MDAX' },
+  { symbol: 'DUE.DE', name: 'Dürr AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'EVK.DE', name: 'Evonik Industries AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'EVT.DE', name: 'Evotec SE', country: 'DE', index: 'MDAX' },
+  { symbol: 'FIE.DE', name: 'Fielmann Group AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'FPE3.DE', name: 'Fuchs SE', country: 'DE', index: 'MDAX' },
+  { symbol: 'FRA.DE', name: 'Fraport AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'G1A.DE', name: 'GEA Group AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'GBF.DE', name: 'Bilfinger SE', country: 'DE', index: 'MDAX' },
+  { symbol: 'GXI.DE', name: 'Gerresheimer AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'HAG.DE', name: 'HENSOLDT AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'HBH.DE', name: 'HORNBACH Holding AG & Co. KGaA', country: 'DE', index: 'MDAX' },
+  { symbol: 'HLE.DE', name: 'FORVIA HELLA SE', country: 'DE', index: 'MDAX' },
+  { symbol: 'HOT.DE', name: 'HOCHTIEF AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'JEN.DE', name: 'JENOPTIK AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'JUN3.DE', name: 'Jungheinrich AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'KBX.DE', name: 'Knorr-Bremse AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'KGX.DE', name: 'KION GROUP AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'KRN.DE', name: 'Krones AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'LEG.DE', name: 'LEG Immobilien SE', country: 'DE', index: 'MDAX' },
+  { symbol: 'LXS.DE', name: 'LANXESS AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'NDA.DE', name: 'Aurubis AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'NEM.DE', name: 'Nemetschek SE', country: 'DE', index: 'MDAX' },
+  { symbol: 'NDX1.DE', name: 'Nordex SE', country: 'DE', index: 'MDAX' },
+  { symbol: 'PBB.DE', name: 'Deutsche Pfandbriefbank AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'PUM.DE', name: 'PUMA SE', country: 'DE', index: 'MDAX' },
+  { symbol: 'RAA.DE', name: 'RATIONAL AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'RDC.DE', name: 'Redcare Pharmacy N.V.', country: 'DE', index: 'MDAX' },
+  { symbol: 'RTL.DE', name: 'RTL Group S.A.', country: 'DE', index: 'MDAX' },
+  { symbol: 'SDF.DE', name: 'K+S Aktiengesellschaft', country: 'DE', index: 'MDAX' },
+  { symbol: 'SHA.DE', name: 'Schaeffler AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'SIL.DE', name: 'Siltronic AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'STR.DE', name: 'Ströer SE & Co. KGaA', country: 'DE', index: 'MDAX' },
+  { symbol: 'SZG.DE', name: 'Salzgitter AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'SZU.DE', name: 'Südzucker AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'TEG.DE', name: 'TAG Immobilien AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'TKA.DE', name: 'thyssenkrupp AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'TLX.DE', name: 'Talanx AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'TMV.DE', name: 'TeamViewer SE', country: 'DE', index: 'MDAX' },
+  { symbol: 'UTDI.DE', name: 'United Internet AG', country: 'DE', index: 'MDAX' },
+  { symbol: 'WCH.DE', name: 'Wacker Chemie AG', country: 'DE', index: 'MDAX' }
+];
+
+const TECDAX_30 = [
+  { symbol: 'SAP.DE', name: 'SAP SE', country: 'DE', index: 'TecDAX' },
+  { symbol: 'DTE.DE', name: 'Deutsche Telekom AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'IFX.DE', name: 'Infineon Technologies AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'SHL.DE', name: 'Siemens Healthineers AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'QIA.DE', name: 'QIAGEN N.V.', country: 'DE', index: 'TecDAX' },
+  { symbol: 'SRT3.DE', name: 'Sartorius AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'AFX.DE', name: 'Carl Zeiss Meditec AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'AIXA.DE', name: 'AIXTRON SE', country: 'DE', index: 'TecDAX' },
+  { symbol: 'BC8.DE', name: 'Bechtle AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'COK.DE', name: 'CANCOM SE', country: 'DE', index: 'TecDAX' },
+  { symbol: 'EVT.DE', name: 'Evotec SE', country: 'DE', index: 'TecDAX' },
+  { symbol: 'FNTN.DE', name: 'freenet AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'HAG.DE', name: 'HENSOLDT AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'JEN.DE', name: 'JENOPTIK AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'NEM.DE', name: 'Nemetschek SE', country: 'DE', index: 'TecDAX' },
+  { symbol: 'NDX1.DE', name: 'Nordex SE', country: 'DE', index: 'TecDAX' },
+  { symbol: 'PNE3.DE', name: 'PNE AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'S92.DE', name: 'SMA Solar Technology AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'SUSS.DE', name: 'SÜSS MicroTec SE', country: 'DE', index: 'TecDAX' },
+  { symbol: 'TMV.DE', name: 'TeamViewer SE', country: 'DE', index: 'TecDAX' },
+  { symbol: 'UTDI.DE', name: 'United Internet AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'SIL.DE', name: 'Siltronic AG', country: 'DE', index: 'TecDAX' },
+  { symbol: '1U1.DE', name: '1&1 AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'ELG.DE', name: 'Elmos Semiconductor SE', country: 'DE', index: 'TecDAX' },
+  { symbol: 'GFT.DE', name: 'GFT Technologies SE', country: 'DE', index: 'TecDAX' },
+  { symbol: 'KBC.DE', name: 'Kontron AG', country: 'DE', index: 'TecDAX' },
+  { symbol: 'ATO.DE', name: 'ATOSS Software SE', country: 'DE', index: 'TecDAX' }
+];
+
+const EURO_STOXX_50 = [
+  { symbol: 'ASML.AS', name: 'ASML Holding N.V.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'MC.PA', name: 'LVMH Moët Hennessy Louis Vuitton SE', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'SAP.DE', name: 'SAP SE', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'TTE.PA', name: 'TotalEnergies SE', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'SIE.DE', name: 'Siemens AG', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'SAN.PA', name: 'Sanofi S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'OR.PA', name: 'L’Oréal S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'SU.PA', name: 'Schneider Electric S.E.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'ALV.DE', name: 'Allianz SE', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'AIR.PA', name: 'Airbus SE', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'AI.PA', name: 'Air Liquide S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'IBE.MC', name: 'Iberdrola S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'DTE.DE', name: 'Deutsche Telekom AG', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'BNP.PA', name: 'BNP Paribas S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'EL.PA', name: 'EssilorLuxottica S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'SAN.MC', name: 'Banco Santander S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'DG.PA', name: 'VINCI S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'CS.PA', name: 'AXA S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'ITX.MC', name: 'Industria de Diseño Textil (Inditex)', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'ENEL.MI', name: 'Enel S.p.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'ISP.MI', name: 'Intesa Sanpaolo S.p.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'UCG.MI', name: 'UniCredit S.p.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'MUV2.DE', name: 'Münchener Rück AG', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'RACE.MI', name: 'Ferrari N.V.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'BBVA.MC', name: 'Banco Bilbao Vizcaya Argentaria (BBVA)', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'INGA.AS', name: 'ING Groep N.V.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'MBG.DE', name: 'Mercedes-Benz Group AG', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'ABI.BR', name: 'Anheuser-Busch InBev SA/NV', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'RMS.PA', name: 'Hermès International S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'SAF.PA', name: 'Safran S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'STLAM.MI', name: 'Stellantis N.V.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'BMW.DE', name: 'Bayerische Motoren Werke AG', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'IFX.DE', name: 'Infineon Technologies AG', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'ADS.DE', name: 'adidas AG', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'BN.PA', name: 'Danone S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'BAS.DE', name: 'BASF SE', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'DHL.DE', name: 'Deutsche Post AG', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'ENGI.PA', name: 'Engie S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'RI.PA', name: 'Pernod Ricard S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'VOW3.DE', name: 'Volkswagen AG', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'AD.AS', name: 'Koninklijke Ahold Delhaize N.V.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'PRX.AS', name: 'Prosus N.V.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'DB1.DE', name: 'Deutsche Börse AG', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'KER.PA', name: 'Kering S.A.', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'NOKIA.HE', name: 'Nokia Oyj', country: 'EU', index: 'Euro Stoxx 50' },
+  { symbol: 'BAYN.DE', name: 'Bayer AG', country: 'DE', index: 'Euro Stoxx 50' },
+  { symbol: 'VIV.PA', name: 'Vivendi SE', country: 'EU', index: 'Euro Stoxx 50' }
+];
+
 const BIST_30 = [
   { symbol: 'AKBNK.IS', name: 'Akbank T.A.S.', country: 'TR', index: 'BIST 30' },
   { symbol: 'ALARK.IS', name: 'Alarko Holding A.S.', country: 'TR', index: 'BIST 30' },
@@ -80,7 +219,25 @@ const BIST_30 = [
   { symbol: 'YKBNK.IS', name: 'Yapi ve Kredi Bankasi A.S.', country: 'TR', index: 'BIST 30' }
 ];
 
-// Vollständige S&P 500 Liste (Ticker) als zuverlässige Basis + dynamischer Wikipedia-Abgleich
+const DOW_JONES_30 = [
+  'AAPL','AMGN','AMZN','AXP','BA','CAT','CRM','CSCO','CVX','DIS',
+  'GS','HD','HON','IBM','JNJ','JPM','KO','MCD','MMM','MRK',
+  'MSFT','NKE','NVDA','PG','SHW','TRV','UNH','V','VZ','WMT'
+].map(symbol => ({ symbol, name: symbol, country: 'US', index: 'Dow Jones' }));
+
+const US_TECH_100 = [
+  'AAPL','MSFT','NVDA','AMZN','META','AVGO','GOOGL','GOOG','COST','TSLA',
+  'NFLX','AMD','TMUS','ASML','CSCO','LIN','PEP','ADBE','ISRG','TXN',
+  'QCOM','INTU','AMGN','CMCSA','AMAT','HON','BKNG','VRTX','ARM','PANW',
+  'ADP','MU','GILD','SBUX','ADI','MELI','INTC','LRCX','KLAC','REGN',
+  'MDLZ','PDD','SNPS','CDNS','MAR','PYPL','CRWD','CEG','CSX','ORLY',
+  'CTAS','NXPI','ABNB','MRVL','FTNT','ROP','WDAY','DASH','PCAR','CPRT',
+  'AEP','TTD','MNST','PAYX','KDP','AZN','ROST','ODFL','CHTR','FAST',
+  'KHC','BKR','GEHC','IDXX','MCHP','EXC','VRSK','EA','CTSH','CCEP',
+  'FANG','XEL','LULU','ON','CSGP','TEAM','DXCM','ZS','TTWO','ANSS',
+  'BIIB','CDW','GFS','ILMN','MDB','MRNA','WBD','DLTR','SMCI'
+].map(symbol => ({ symbol, name: symbol, country: 'US', index: 'US Tech 100' }));
+
 const SP500_TICKERS = [
   'MMM','AOS','ABT','ABBV','ACN','ADBE','AMD','AES','AFL','A','APD','ABNB','AKAM','ALB','ARE','ALGN','ALLE','LNT','ALL','GOOGL',
   'GOOG','MO','AMZN','AMCR','AEE','AEP','AXP','AIG','AMT','AWK','AMP','AME','AMGN','APH','ADI','AON','APA','APO','AAPL','AMAT',
@@ -140,9 +297,7 @@ async function getSP500List() {
         }
       }
     }
-  } catch (_) {
-    // Fallback auf eingebaute Liste
-  }
+  } catch (_) {}
   return SP500_TICKERS.map(symbol => ({
     symbol,
     name: symbol,
@@ -151,14 +306,52 @@ async function getSP500List() {
   }));
 }
 
+// Führt alle Indizes zusammen und speichert pro Aktie alle Indizes, in denen sie gelistet ist (`indices: [...]`)
 async function getAllConstituents() {
   const sp500 = await getSP500List();
-  return [...DAX_40, ...BIST_30, ...sp500];
+  const rawList = [
+    ...DAX_40,
+    ...MDAX_50,
+    ...TECDAX_30,
+    ...EURO_STOXX_50,
+    ...BIST_30,
+    ...DOW_JONES_30,
+    ...US_TECH_100,
+    ...sp500
+  ];
+
+  const bySymbol = new Map();
+  for (const item of rawList) {
+    if (!bySymbol.has(item.symbol)) {
+      bySymbol.set(item.symbol, {
+        symbol: item.symbol,
+        name: item.name,
+        country: item.country,
+        index: item.index,
+        indices: [item.index]
+      });
+    } else {
+      const existing = bySymbol.get(item.symbol);
+      if (!existing.indices.includes(item.index)) {
+        existing.indices.push(item.index);
+      }
+      if (existing.name === existing.symbol && item.name !== item.symbol) {
+        existing.name = item.name;
+      }
+    }
+  }
+
+  return Array.from(bySymbol.values());
 }
 
 module.exports = {
   DAX_40,
+  MDAX_50,
+  TECDAX_30,
+  EURO_STOXX_50,
   BIST_30,
+  DOW_JONES_30,
+  US_TECH_100,
   SP500_TICKERS,
   getSP500List,
   getAllConstituents
