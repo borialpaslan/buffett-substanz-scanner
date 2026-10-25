@@ -1,7 +1,7 @@
 {
   "name": "buffett-substanz-scanner",
   "version": "1.0.0",
-  "description": "Täglicher Warren-Buffett Substanz- & Insolvenzmasse-Aktienscanner für DAX 40 (DE), BIST 30 (Türkei) und S&P 500 (USA)",
+  "description": "Täglicher Warren-Buffett Substanz- & Insolvenzmasse-Aktienscanner für DAX 40, MDAX, TecDAX, Euro Stoxx 50, BIST 30, Dow Jones, US Tech 100 und S&P 500",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

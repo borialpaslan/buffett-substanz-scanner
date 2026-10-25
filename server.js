@@ -125,9 +125,11 @@ cron.schedule('0 8 * * *', () => {
 
 app.listen(PORT, () => {
   console.log(`================================================================`);
-  console.log(` Buffett Substanz- & Insolvenzmasse-Scanner läuft lokal auf:`);
-  console.log(` -> http://localhost:${PORT}`);
-  console.log(` Indizes: DAX 40 (DE) | BIST 30 (TR) | S&P 500 (USA)`);
+  console.log(` Buffett Substanz- & Insolvenzmasse-Scanner läuft auf:`);
+  console.log(` -> Lokal:  http://localhost:${PORT}`);
+  console.log(` -> Cloud:  https://buffett-scanner-2026.web.app`);
+  console.log(` -> GitHub: https://github.com/borialpaslan/buffett-substanz-scanner`);
+  console.log(` 8 Indizes: DAX 40 | MDAX | TecDAX | Euro Stoxx 50 | BIST 30 | Dow Jones | US Tech 100 | S&P 500`);
   console.log(` Automatischer Tages-Scan: Täglich 08:00 Uhr + beim Serverstart`);
   console.log(`================================================================`);
 
@@ -136,12 +138,16 @@ app.listen(PORT, () => {
   const todayStr = new Date().toISOString().slice(0, 10);
   if (!cached || cached.scanDate !== todayStr) {
     console.log('Kein Scan für heute (%s) im Cache. Starte Hintergrund-Scan...', todayStr);
-    runDailyScan({ force: false }).catch(err => {
-      console.error('Initialer Scan-Fehler:', err.message);
-    });
+    runDailyScan({ force: false })
+      .then(r => {
+        console.log('Tages-Scan (%s) abgeschlossen: %d Aktien in 8 Indizes ausgewertet.', r?.scanDate, r?.stocks?.length || 0);
+      })
+      .catch(err => {
+        console.error('Initialer Scan-Fehler:', err.message);
+      });
   } else {
     console.log(
-      'Tages-Scan vom %s geladen (%d analysierte Aktien im Cache).',
+      'Tages-Scan vom %s geladen (%d analysierte Aktien in 8 Indizes im Cache).',
       cached.scanDate,
       cached.stocks ? cached.stocks.length : 0
     );
